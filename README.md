@@ -10,7 +10,7 @@
 ## Installation instructions:
 
 
-Or simply add this github repo `https://github.com/hardware-crash/hassio-addons.git` as a third-party add-on repository in Home Assistant **Add-on Store** then install it.
+Simply add this github repo `https://github.com/hardware-crash/hassio-addons.git` as a third-party add-on repository in Home Assistant **Add-on Store** then install it.
 See [here](https://www.home-assistant.io/hassio/installing_third_party_addons/) for more details on how to do that
 
 ## Credits:
