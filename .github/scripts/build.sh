@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-ARCH=$2
+ARCH=$1
 
 docker run --rm --privileged \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
