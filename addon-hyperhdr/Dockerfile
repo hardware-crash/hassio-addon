@@ -33,11 +33,11 @@ RUN wget -q "${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-$
     echo "Verifiziere die heruntergeladene Datei:" && \
     ls -lh /tmp/HyperHDR.tar.gz && \
     tar -xvz --no-same-owner --no-same-permissions -C /opt/hyperhdr -f /tmp/HyperHDR.tar.gz && \
-    # Erstelle symbolische Links für die ausführbaren Dateien
-    ln -s /opt/hyperhdr/bin/hyperhdr /usr/local/bin/hyperhdr && \
-    ln -s /opt/hyperhdr/bin/hyperhdr-remote /usr/local/bin/hyperhdr-remote && \
     echo "Extraktion abgeschlossen." && \
     ls -l /opt/hyperhdr/bin && \
+    ln -s /opt/hyperhdr/bin/hyperhdr /usr/local/bin/hyperhdr && \
+    ln -s /opt/hyperhdr/bin/hyperhdr-remote /usr/local/bin/hyperhdr-remote && \
+    echo "Symbolische Links erstellt:" && \
     ls -l /usr/local/bin/hyperhdr /usr/local/bin/hyperhdr-remote
 
 VOLUME /config
