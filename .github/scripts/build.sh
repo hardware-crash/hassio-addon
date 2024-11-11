@@ -20,23 +20,13 @@ case "$ARCH_INPUT" in
         ;;
 esac
 
-# Definiere Download-URL und Build-Version
+# Definiere weitere benötigte Argumente, falls vorhanden
 DOWNLOAD_URL="https://github.com/awawa-dev/HyperHDR/releases/download"
 BUILD_VERSION="${RELEASE}" # Annahme: RELEASE ist in der Umgebung gesetzt
 
-# Konstruiere die Datei-URL
-FILE_URL="${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-${ARCH}.tar.gz"
-
-echo "Downloading ${FILE_URL}"
-
-# Download und Extraktion
-wget --tries=3 "${FILE_URL}" -O /tmp/HyperHDR.tar.gz
-
-# Überprüfe die heruntergeladene Datei
-echo "Verifiziere die heruntergeladene Datei:"
-ls -lh /tmp/HyperHDR.tar.gz
-
-# Extrahiere nach /opt/hyperhdr mit angepassten Berechtigungen
-tar -xvz --no-same-owner --no-same-permissions -C /opt/hyperhdr -f /tmp/HyperHDR.tar.gz
-
-echo "Extraktion abgeschlossen."
+# Docker-Build ausführen
+docker build \
+    --build-arg DOWNLOAD_URL="${DOWNLOAD_URL}" \
+    --build-arg BUILD_VERSION="${BUILD_VERSION}" \
+    --build-arg BUILD_ARCH="${ARCH}" \
+    -t your-docker-repo/hyperhdr:${BUILD_VERSION}-${ARCH} .
