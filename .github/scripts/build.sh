@@ -1,32 +1,30 @@
-#!/bin/bash
+#!/bin/sh
 set -e
+ARCH=$1
 
-ARCH_INPUT=$1
+# Überprüfe, ob ARCH übergeben wurde
+if [ -z "$ARCH" ]; then
+    echo "Usage: $0 <architecture>"
+    exit 1
+fi
 
-# Architektur-Mapping
-case "$ARCH_INPUT" in
-    x86_64 | amd64)
-        ARCH="x86_64"
-        ;;
-    armv6l | armhf)
-        ARCH="armv6l"
-        ;;
-    aarch64)
-        ARCH="aarch64"
+# Überprüfe, ob die Build-Architektur unterstützt wird
+case "$ARCH" in
+    x86_64 | amd64 | aarch64 | armhf)
         ;;
     *)
-        echo "Unsupported architecture: $ARCH_INPUT"
+        echo "Unsupported architecture: $ARCH"
         exit 1
         ;;
 esac
 
-# Definiere weitere benötigte Argumente, falls vorhanden
-DOWNLOAD_URL="https://github.com/awawa-dev/HyperHDR/releases/download"
-BUILD_VERSION="${RELEASE}" # Annahme: RELEASE ist in der Umgebung gesetzt
-
-# Docker-Build ausführen
-docker build \
-    --build-arg DOWNLOAD_URL="${DOWNLOAD_URL}" \
-    --build-arg BUILD_VERSION="${BUILD_VERSION}" \
-    --build-arg BUILD_ARCH="${ARCH}" \
-    -t your-docker-repo/hyperhdr:${BUILD_VERSION}-${ARCH} .
+# Führe den Docker-Builder aus
+docker run --rm --privileged \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    -v ${GITHUB_WORKSPACE:-$(PWD)}/addon-hyperhdr:/data \
+    homeassistant/amd64-builder \
+    --target /data \
+    --docker-user "${DOCKER_USER}" \
+    --docker-password "${DOCKER_PASSWORD}" \
+    --no-latest \
+    --${ARCH:-all}
