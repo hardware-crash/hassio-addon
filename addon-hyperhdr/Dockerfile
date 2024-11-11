@@ -1,45 +1,37 @@
-# Stage 1: Builder
-FROM ubuntu:22.04 AS builder
+ARG BUILD_FROM
 
-# Setze Build-Argumente
-ARG DOWNLOAD_URL=https://github.com/awawa-dev/HyperHDR/releases/download
-ARG BUILD_VERSION=20.0.0.0
+FROM ${BUILD_FROM}
+
+ARG DOWNLOAD_URL
+ARG BUILD_VERSION
+ARG BUILD_ARCH
+
+ENV LANG C.UTF-8
 
 # Installiere notwendige Pakete
-RUN apt-get update && apt-get install -y wget tar
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends git cmake build-essential \
+    libasound2-dev qtbase5-dev libqt5serialport5-dev libqt5sql5-sqlite libqt5svg5-dev libqt5x11extras5-dev libusb-1.0-0-dev \
+    python3-minimal rpm libcec-dev libxcb-image0-dev libxcb-util0-dev libxcb-shm0-dev libglvnd-dev \
+    libxcb-render0-dev libxcb-randr0-dev libxrandr-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev \
+    libjpeg-dev libturbojpeg0-dev libssl-dev zlib1g-dev ca-certificates curl wget dialog apt-utils \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Download und Extraktion von HyperHDR
-RUN set -e; \
-    ARCH=$(uname -m) && \
-    case "$ARCH" in \
-        x86_64) ARCH="x86_64" ;; \
-        aarch64) ARCH="aarch64" ;; \
-        armv6l) ARCH="armv6l" ;; \
-        *) echo "Unsupported architecture: $ARCH"; exit 1 ;; \
-    esac && \
-    FILE_URL="${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-${ARCH}.tar.gz" && \
-    echo "Downloading ${FILE_URL}" && \
-    wget --tries=3 "${FILE_URL}" -O /tmp/HyperHDR.tar.gz && \
-    echo "Downloaded HyperHDR.tar.gz, size:" && \
-    ls -lh /tmp/HyperHDR.tar.gz && \
-    echo "Extracting HyperHDR.tar.gz..." && \
-    tar -xvz --no-same-owner --no-same-permissions -C /usr -f /tmp/HyperHDR.tar.gz && \
-    echo "Extraction complete."
-
-# Stage 2: Final Image
-FROM ubuntu:22.04
-
-# Kopiere extrahierte Dateien aus dem Builder-Stage
-COPY --from=builder /usr /usr
-
-# Kopiere dein Run-Skript
+# Kopiere und mache das Run-Skript ausführbar
 COPY run.sh /
-
-# Mache das Run-Skript ausführbar
 RUN chmod a+x /run.sh
 
-# Definiere Volume
-VOLUME /config
+# Erstelle das Zielverzeichnis
+RUN mkdir -p /opt/hyperhdr
 
-# Definiere Entrypoint oder CMD
-CMD ["/run.sh"]
+# Download und Extraktion in /opt/hyperhdr
+RUN wget -q "${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-${BUILD_ARCH}.tar.gz" -O /tmp/HyperHDR.tar.gz && \
+    tar -xvz --no-same-owner --no-same-permissions -C /opt/hyperhdr -f /tmp/HyperHDR.tar.gz && \
+    # Erstelle symbolische Links für die ausführbaren Dateien
+    ln -s /opt/hyperhdr/bin/hyperhdr /usr/local/bin/hyperhdr && \
+    ln -s /opt/hyperhdr/bin/hyperhdr-remote /usr/local/bin/hyperhdr-remote
+
+VOLUME /config
+EXPOSE 8090 8092 19333 19400 19444 19445
+RUN echo 'Running webUI on port 8090. Port 19444-19445 exposed for json, protobuffer server (screen-cap)'
+CMD [ "/run.sh" ]
