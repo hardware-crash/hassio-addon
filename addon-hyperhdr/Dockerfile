@@ -1,13 +1,11 @@
-# Definiere die Basis-Image
 ARG BUILD_FROM
+
 FROM ${BUILD_FROM}
 
-# Definiere die Build-Argumente
 ARG DOWNLOAD_URL
 ARG BUILD_VERSION
 ARG BUILD_ARCH
 
-# Setze die Umgebungsvariable für die Sprache
 ENV LANG C.UTF-8
 
 # Installiere notwendige Pakete
@@ -24,7 +22,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-ins
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Kopiere das Run-Skript und mache es ausführbar
+# Kopiere und mache das Run-Skript ausführbar
 COPY run.sh /
 RUN chmod a+x /run.sh
 
@@ -43,10 +41,7 @@ RUN wget -q "${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-$
     ls -l /opt/hyperhdr/bin && \
     ls -l /usr/local/bin/hyperhdr /usr/local/bin/hyperhdr-remote
 
-# Definiere das Volume und die exponierten Ports
 VOLUME /config
 EXPOSE 8090 8092 19333 19400 19444 19445
-
-# Ausgabe einer Nachricht und Setzen des Entrypoints
 RUN echo 'Running webUI on port 8090. Port 19444-19445 exposed for json, protobuffer server (screen-cap)'
 CMD [ "/run.sh" ]
