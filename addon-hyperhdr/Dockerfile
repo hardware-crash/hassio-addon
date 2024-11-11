@@ -1,43 +1,45 @@
-ARG BUILD_FROM
+# Stage 1: Builder
+FROM ubuntu:22.04 AS builder
 
-FROM ${BUILD_FROM}
+# Setze Build-Argumente
+ARG DOWNLOAD_URL=https://github.com/awawa-dev/HyperHDR/releases/download
+ARG BUILD_VERSION=20.0.0.0
 
-ARG DOWNLOAD_URL
-ARG BUILD_VERSION
-ARG BUILD_ARCH
+# Installiere notwendige Pakete
+RUN apt-get update && apt-get install -y wget tar
 
-ENV LANG C.UTF-8
+# Download und Extraktion von HyperHDR
+RUN set -e; \
+    ARCH=$(uname -m) && \
+    case "$ARCH" in \
+        x86_64) ARCH="x86_64" ;; \
+        aarch64) ARCH="aarch64" ;; \
+        armv6l) ARCH="armv6l" ;; \
+        *) echo "Unsupported architecture: $ARCH"; exit 1 ;; \
+    esac && \
+    FILE_URL="${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-${ARCH}.tar.gz" && \
+    echo "Downloading ${FILE_URL}" && \
+    wget --tries=3 "${FILE_URL}" -O /tmp/HyperHDR.tar.gz && \
+    echo "Downloaded HyperHDR.tar.gz, size:" && \
+    ls -lh /tmp/HyperHDR.tar.gz && \
+    echo "Extracting HyperHDR.tar.gz..." && \
+    tar -xvz --no-same-owner --no-same-permissions -C /usr -f /tmp/HyperHDR.tar.gz && \
+    echo "Extraction complete."
 
-# from nocturno:
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends git cmake build-essential \
-    libasound2-dev qtbase5-dev libqt5serialport5-dev libqt5sql5-sqlite libqt5svg5-dev libqt5x11extras5-dev libusb-1.0-0-dev \
-    python3-minimal rpm libcec-dev libxcb-image0-dev libxcb-util0-dev libxcb-shm0-dev libglvnd-dev \
-    libxcb-render0-dev libxcb-randr0-dev libxrandr-dev libxrender-dev libavahi-core-dev libavahi-compat-libdnssd-dev \
-    libjpeg-dev libturbojpeg0-dev libssl-dev zlib1g-dev ca-certificates curl wget dialog apt-utils \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Stage 2: Final Image
+FROM ubuntu:22.04
 
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-# 		libqt5widgets5 \
-# 		libqt5serialport5 \
-# 		libqt5sql5-sqlite \
-# 		libqt5x11extras5 \
-# 		libavahi-core7 \
-# 		libavahi-compat-libdnssd1 \
-# 		libusb-1.0-0 \
-# 		libjpeg-dev \
-# 		libssl1.1 \
-# 		zlib1g \
-# 		libcec4 \
-# 		wget \
-# 		v4l-utils \
-# 	&& rm -rf /var/lib/apt/lists/*
+# Kopiere extrahierte Dateien aus dem Builder-Stage
+COPY --from=builder /usr /usr
+
+# Kopiere dein Run-Skript
 COPY run.sh /
+
+# Mache das Run-Skript ausführbar
 RUN chmod a+x /run.sh
 
-RUN wget -q "${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-$(uname -m).tar.gz" -O - | tar -xvz -C /usr
-
+# Definiere Volume
 VOLUME /config
-EXPOSE 8090 8092 19333 19400 19444 19445
-RUN echo 'Running webUI on port 8090. Port 19444-19445 exposed for json, protobuffer server (screen-cap)'
-CMD [ "/run.sh" ]
+
+# Definiere Entrypoint oder CMD
+CMD ["/run.sh"]
