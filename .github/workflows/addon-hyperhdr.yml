@@ -27,6 +27,7 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          RELEASE: ${{ env.RELEASE }}
         run: ./.github/scripts/build.sh x86_64
 
       - name: Build for armv6l
@@ -34,6 +35,7 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          RELEASE: ${{ env.RELEASE }}
         run: ./.github/scripts/build.sh armv6l
 
       - name: Build for aarch64
@@ -41,6 +43,7 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          RELEASE: ${{ env.RELEASE }}
         run: ./.github/scripts/build.sh aarch64
 
       - name: Update config.json if version changed
