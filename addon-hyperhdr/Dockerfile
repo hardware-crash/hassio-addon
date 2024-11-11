@@ -28,12 +28,15 @@ RUN chmod a+x /run.sh
 # Erstelle das Zielverzeichnis und überprüfe es
 RUN mkdir -p /opt/hyperhdr && ls -ld /opt/hyperhdr
 
-# Download und Extraktion in /opt/hyperhdr mit angepassten Berechtigungen
+# Download und Extraktion in /opt/hyperhdr mit erweiterten Debugging-Schritten
 RUN wget -q "${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-${BUILD_ARCH}.tar.gz" -O /tmp/HyperHDR.tar.gz && \
     echo "Verifiziere die heruntergeladene Datei:" && \
     ls -lh /tmp/HyperHDR.tar.gz && \
+    echo "Inhalt der heruntergeladenen Datei:" && \
+    tar -tzf /tmp/HyperHDR.tar.gz && \
     tar -xvz --no-same-owner --no-same-permissions -C /opt/hyperhdr -f /tmp/HyperHDR.tar.gz && \
     echo "Extraktion abgeschlossen." && \
+    ls -l /opt/hyperhdr && \
     ls -l /opt/hyperhdr/bin && \
     ln -s /opt/hyperhdr/bin/hyperhdr /usr/local/bin/hyperhdr && \
     ln -s /opt/hyperhdr/bin/hyperhdr-remote /usr/local/bin/hyperhdr-remote && \
