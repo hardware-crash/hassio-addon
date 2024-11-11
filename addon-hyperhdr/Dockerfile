@@ -21,15 +21,20 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-ins
 COPY run.sh /
 RUN chmod a+x /run.sh
 
-# Erstelle das Zielverzeichnis
-RUN mkdir -p /opt/hyperhdr
+# Erstelle das Zielverzeichnis und überprüfe es
+RUN mkdir -p /opt/hyperhdr && ls -ld /opt/hyperhdr
 
-# Download und Extraktion in /opt/hyperhdr
+# Download und Extraktion in /opt/hyperhdr mit Debugging-Schritten
 RUN wget -q "${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-${BUILD_ARCH}.tar.gz" -O /tmp/HyperHDR.tar.gz && \
+    echo "Verifiziere die heruntergeladene Datei:" && \
+    ls -lh /tmp/HyperHDR.tar.gz && \
     tar -xvz --no-same-owner --no-same-permissions -C /opt/hyperhdr -f /tmp/HyperHDR.tar.gz && \
-    # Erstelle symbolische Links für die ausführbaren Dateien
+    echo "Extraktion abgeschlossen." && \
+    ls -l /opt/hyperhdr/bin && \
     ln -s /opt/hyperhdr/bin/hyperhdr /usr/local/bin/hyperhdr && \
-    ln -s /opt/hyperhdr/bin/hyperhdr-remote /usr/local/bin/hyperhdr-remote
+    ln -s /opt/hyperhdr/bin/hyperhdr-remote /usr/local/bin/hyperhdr-remote && \
+    echo "Symbolische Links erstellt:" && \
+    ls -l /usr/local/bin/hyperhdr /usr/local/bin/hyperhdr-remote
 
 VOLUME /config
 EXPOSE 8090 8092 19333 19400 19444 19445
