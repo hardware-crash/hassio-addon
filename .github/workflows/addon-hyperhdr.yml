@@ -22,6 +22,9 @@ jobs:
       - name: Sync version to source
         run: ./.github/scripts/update-hyperhdr-version.sh
 
+      - name: Set Release Variable
+        run: echo "RELEASE=${{ env.RELEASE }}" >> $GITHUB_ENV
+
       - name: Build for x86_64
         shell: bash
         env:
