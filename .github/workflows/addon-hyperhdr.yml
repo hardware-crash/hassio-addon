@@ -1,6 +1,7 @@
 name: 'Addon-HyperHDR'
 
-on: [ workflow_dispatch ]
+on:
+  workflow_dispatch:
 
 permissions:
   contents: write  # Gewährt Schreibzugriff auf Repository-Inhalte
@@ -23,7 +24,10 @@ jobs:
         run: ./.github/scripts/update-hyperhdr-version.sh
 
       - name: Set Release Variable
-        run: echo "RELEASE=${{ env.RELEASE }}" >> $GITHUB_ENV
+        run: echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: List files before build
+        run: ls -la addon-hyperhdr
 
       - name: Build for x86_64
         shell: bash
