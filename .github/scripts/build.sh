@@ -36,7 +36,7 @@ wget --tries=3 "${FILE_URL}" -O /tmp/HyperHDR.tar.gz
 echo "Verifiziere die heruntergeladene Datei:"
 ls -lh /tmp/HyperHDR.tar.gz
 
-# Extrahiere nach /usr mit angepassten Berechtigungen
-tar -xvz --no-same-owner --no-same-permissions -C /usr -f /tmp/HyperHDR.tar.gz
+# Extrahiere nach /opt/hyperhdr mit angepassten Berechtigungen
+tar -xvz --no-same-owner --no-same-permissions -C /opt/hyperhdr -f /tmp/HyperHDR.tar.gz
 
-echo "Extraction complete."
+echo "Extraktion abgeschlossen."
