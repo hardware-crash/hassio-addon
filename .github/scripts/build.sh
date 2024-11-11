@@ -43,4 +43,4 @@ echo "Verifiziere die heruntergeladene Datei:"
 ls -lh /tmp/HyperHDR.tar.gz
 
 # Extrahiere nach /usr
-tar -xvz -C /usr -f /tmp/HyperHDR.tar.gz
+tar -xvz --no-same-owner --no-same-permissions -C /usr -f /tmp/HyperHDR.tar.gz
