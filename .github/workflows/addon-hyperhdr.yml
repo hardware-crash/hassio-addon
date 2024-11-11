@@ -1,76 +1,23 @@
-name: 'Addon-HyperHDR'
+- name: Build for x86_64
+  shell: bash
+  env:
+    DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
+    DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+    RELEASE: ${{ env.RELEASE }}
+  run: ./.github/scripts/build.sh x86_64
 
-on:
-  workflow_dispatch:
+- name: Build for armv6l
+  shell: bash
+  env:
+    DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
+    DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+    RELEASE: ${{ env.RELEASE }}
+  run: ./.github/scripts/build.sh armv6l
 
-permissions:
-  contents: write  # Gewährt Schreibzugriff auf Repository-Inhalte
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Sync version to source
-        run: ./.github/scripts/update-hyperhdr-version.sh
-
-      - name: Set Release Variable
-        run: echo "RELEASE=${{ github.ref_name }}" >> $GITHUB_ENV
-
-      - name: List files before build
-        run: ls -la addon-hyperhdr
-
-      - name: Inspect Dockerfile
-        run: cat addon-hyperhdr/Dockerfile
-
-      - name: Build for x86_64
-        shell: bash
-        env:
-          DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-          RELEASE: ${{ env.RELEASE }}
-        run: ./.github/scripts/build.sh x86_64
-
-      - name: Build for armv6l
-        shell: bash
-        env:
-          DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-          RELEASE: ${{ env.RELEASE }}
-        run: ./.github/scripts/build.sh armv6l
-
-      - name: Build for aarch64
-        shell: bash
-        env:
-          DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-          RELEASE: ${{ env.RELEASE }}
-        run: ./.github/scripts/build.sh aarch64
-
-      - name: Update config.json if version changed
-        uses: test-room-7/action-update-file@v1
-        if: ${{ env.VERSION != env.RELEASE }}
-        with:
-          file-path: addon-hyperhdr/config.json
-          commit-msg: Update version
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        if: ${{ env.VERSION != env.RELEASE }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.RELEASE }}
-          release_name: ${{ env.RELEASE }}
-          draft: false
-          prerelease: false
+- name: Build for aarch64
+  shell: bash
+  env:
+    DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
+    DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+    RELEASE: ${{ env.RELEASE }}
+  run: ./.github/scripts/build.sh aarch64
