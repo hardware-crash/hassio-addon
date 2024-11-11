@@ -29,6 +29,9 @@ jobs:
       - name: List files before build
         run: ls -la addon-hyperhdr
 
+      - name: Inspect Dockerfile
+        run: cat addon-hyperhdr/Dockerfile
+
       - name: Build for x86_64
         shell: bash
         env:
