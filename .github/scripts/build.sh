@@ -13,14 +13,17 @@ case "$ARCH" in
     x86_64 | amd64)
         BUILDER_IMAGE="homeassistant/amd64-builder"
         ARCH_FLAG="--amd64"
+        BUILD_ARCH="amd64"
         ;;
     armv6l | armhf)
         BUILDER_IMAGE="homeassistant/armhf-builder"
         ARCH_FLAG="--armhf"
+        BUILD_ARCH="armhf"
         ;;
     aarch64)
         BUILDER_IMAGE="homeassistant/aarch64-builder"
         ARCH_FLAG="--aarch64"
+        BUILD_ARCH="aarch64"
         ;;
     *)
         echo "Unsupported architecture: $ARCH"
@@ -37,4 +40,5 @@ docker run --rm --privileged \
     --docker-user "${DOCKER_USER}" \
     --docker-password "${DOCKER_PASSWORD}" \
     --no-latest \
-    ${ARCH_FLAG}
+    ${ARCH_FLAG} \
+    --build-arch "${BUILD_ARCH}"
