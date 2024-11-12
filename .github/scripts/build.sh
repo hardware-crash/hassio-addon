@@ -39,4 +39,5 @@ docker run --rm --privileged \
     --docker-user "${DOCKER_USER}" \
     --docker-password "${DOCKER_PASSWORD}" \
     --no-latest \
-    --${ARCH:-all}
+    ${ARCH_FLAG} \
+    --build-arch "${BUILD_ARCH}"
