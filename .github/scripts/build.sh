@@ -16,7 +16,7 @@ case "$ARCH" in
         ;;
     armv6l | armhf)
         BUILDER_IMAGE="homeassistant/armhf-builder"
-        ARCH_FLAG="--armhf"
+        ARCH_FLAG="--armv6l"
         ;;
     aarch64)
         BUILDER_IMAGE="homeassistant/aarch64-builder"
