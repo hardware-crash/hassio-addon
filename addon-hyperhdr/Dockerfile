@@ -29,7 +29,7 @@ RUN chmod a+x /run.sh
 RUN mkdir -p /opt/hyperhdr && ls -ld /opt/hyperhdr
 
 # Download und Extraktion mit URL-Ausgabe
-RUN URL="${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-x86_64.deb.tar.gz" && \
+RUN URL="${DOWNLOAD_URL}/v${BUILD_VERSION}/HyperHDR-${BUILD_VERSION}-Linux-x86_64.tar.gz" && \
     echo "Download-Link: $URL" && \
     wget -q "$URL" -O /tmp/HyperHDR.tar.gz && \
     echo "Verifiziere die heruntergeladene Datei:" && \
