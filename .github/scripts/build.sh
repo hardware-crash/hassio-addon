@@ -2,6 +2,35 @@
 set -e
 ARCH=$1
 
+# Überprüfe, ob ARCH übergeben wurde
+if [ -z "$ARCH" ]; then
+    echo "Usage: $0 <architecture>"
+    exit 1
+fi
+
+# Architektur-Mapping und Auswahl des richtigen Builder-Images
+case "$ARCH" in
+    x86_64 | amd64)
+        BUILDER_IMAGE="homeassistant/amd64-builder"
+        ARCH_FLAG="--amd64"
+        BUILD_ARCH="amd64"
+        ;;
+    armv6l | armhf)
+        BUILDER_IMAGE="homeassistant/armhf-builder"
+        ARCH_FLAG="--armhf"
+        BUILD_ARCH="armhf"
+        ;;
+    aarch64)
+        BUILDER_IMAGE="homeassistant/aarch64-builder"
+        ARCH_FLAG="--aarch64"
+        BUILD_ARCH="aarch64"
+        ;;
+    *)
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+        ;;
+esac
+
 docker run --rm --privileged \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
     -v ${GITHUB_WORKSPACE:-$(PWD)}/addon-hyperhdr:/data \
